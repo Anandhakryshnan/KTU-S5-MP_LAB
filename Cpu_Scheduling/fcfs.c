@@ -1,100 +1,72 @@
-#include<stdio.h>
-#include<string.h>
-struct process
-{
-  char name[20];
-  int at,tt,bt,wt,ct,status;
-}p[20],temp;
-struct done
-{
-  char name[20];
-  int st,ct;
-}d[20];
-void main()
-{
-  int i,j,n,num,idle=0;
-  float avwt=0;
-  float avtt=0;
-  printf("ENTER THE NUMBER OF PROCESSES : ");
-  scanf("%d",&n);
-  for(i=0;i<n;i++)               
-  {
-    printf("\nENTER DETAILS OF PROCESS %d",i+1);
-    printf("\nPROCESS NAME : ");
-    scanf(" %s",p[i].name);
-    printf("ARRIVAL TIME : ");
-    scanf("%d",&p[i].at);
-    printf("BURST TIME : ");
-    scanf("%d",&p[i].bt);
-    p[i].status = 0;
-  }
-  for(i=0;i<n;i++)                      
-  {
-    for(j=0;j<n-i-1;j++)
-    {
-      if(p[j].at > p[j+1].at)
-      {
-        temp = p[j];
-        p[j] = p[j+1];
-        p[j+1] = temp;
-      }
-    }
-  }
-  for(i=0,j=0,num=0;j<n;)             
-  {
-    if(p[j].at<=i && p[j].status==0)
-    {
-      if(idle==1)
-      {
-        d[num].ct=i;
-        num++;
-        idle = 0;
-      }
-      strcpy(d[num].name,p[j].name);
-      d[num].st = i;
-      d[num].ct = i + p[j].bt;
-      p[j].wt = d[num].st - p[j].at;
-      p[j].tt = p[j].wt + p[j].bt;
-      p[j].ct = d[num].ct;
-      i = d[num].ct;
-      p[j].status = 1;
-      j++;
-      num++;
+#include <stdio.h>
 
+int i, n;
+float tatAvg, wtAvg;
+
+void read(int b[]) {
+    for (i = 0; i < n; ++i) {
+        printf("Enter the burst time of process %d: ", i);
+        scanf("%d", &b[i]);
     }
-    else if(idle == 0)
-    {
-      strcpy(d[num].name,"Idle");
-      d[num].st = i;
-      i++;
-      idle = 1;
-    }
-    else
-    {
-      i++;
-    }
-  }
-  printf("\nPROCESS NAME\tCOMPLETION TIME (ms)\tWAITING TIME (ms)\tTURNAROUND TIME (ms)\n");
-  for(int i=0;i<n;i++)
-  {
-    printf("    %s\t\t\t%d\t\t\t%d\t\t\t%d\n",p[i].name,p[i].ct,p[i].wt,p[i].tt);
-    avwt+=p[i].wt;
-    avtt+=p[i].tt;
-  }
-  printf("\n\nGANTT CHART ");
-  printf("\n----------------------------------------------------------\n");
-      for(i=0;i<num;i++)
-      {
-          printf("|");
-          printf("   %s\t",d[i].name);
-       }
-       printf(" |");
-       printf("\n----------------------------------------------------------\n");
-       for(i=0;i<num;i++)
-       {
-          printf("%d\t",d[i].st);
-       }
-       printf("%d\t",d[num-1].ct);
-  printf("\n\nAVERAGE WAITING TIME : %f",(avwt/n));
-  printf("\nAVERAGE TURNAROUND TIME : %f\n",(avtt/n));
 }
+
+void findWaitingtime(int b[], int wt[]) {
+    wt[0] = 0;
+    int wtSum = 0;
+    for (i = 1; i < n; ++i) {
+        wt[i] = wt[i - 1] + b[i - 1];
+        wtSum += wt[i];
+    }
+    wtAvg = (float)wtSum / n;
+}
+
+void findTurnAroundtime(int tat[], int b[], int wt[]) {
+    int tatSum = 0;
+    for (i = 0; i < n; ++i) {
+        tat[i] = b[i] + wt[i];
+        tatSum += tat[i];
+    }
+    tatAvg = (float)tatSum / n;
+}
+
+void display(int b[], int wt[], int tat[]) {
+    printf("Process\tBurstTime WaitingTime  TurnAroundTime\n");
+    for (i = 0; i < n; ++i) {
+        printf("%d\t%d\t\t%d\t%d\n", i, b[i], wt[i], tat[i]);
+    }
+    printf("average waiting time: %f", wtAvg);
+    printf("\naverage turnaround time: %f", tatAvg);
+    printf("\n");
+}
+
+void calcTime(int b[]) {
+    int wt[20], tat[20];
+    findWaitingtime(b, wt);
+    findTurnAroundtime(tat, b, wt);
+    display(b, wt, tat);
+}
+
+int main() {
+
+    int b[20];
+    printf("Number of Processes:");
+    scanf("%d", &n);
+    read(b);
+    calcTime(b);
+
+    return 0;
+}
+
+/* OUTPUT
+    Number of Processes:3
+    Enter the burst time of process 0: 23
+    Enter the burst time of process 1: 33
+    Enter the burst time of process 2: 11
+    Process BurstTime WaitingTime  TurnAroundTime
+    0       23              0       23
+    1       33              23      56
+    2       11              56      67
+    average waiting time: 26.333334
+    average turnaround time: 48.666668
+    
+*/
