@@ -1,27 +1,24 @@
 #include<stdio.h>
-#include<string.h>
-void main()
-{
-	int tr[20],cr,n,i,sum=0,new;
-	printf("ENTER THE NUMBER OF TRACKS : ");
-	scanf("%d",&n);
-	printf("ENTER THE HEAD POINTER POSITION : ");
-	scanf("%d",&cr);
-	printf("ENTER THE TRACKS TO BE TRAVERSED : ");
-	for(i=0;i<n;i++)
-	{
-		new = 0;
-		scanf("%d",&tr[i]);
-		new=cr-tr[i];
-		if(new<0)
-		{
-			new=tr[i]-cr;
-		}
-		cr=tr[i];
-		sum=sum + new;
-	}
-	printf("TRAVERSED ORDER : ");
-	for(i=0;i<n;i++)
-		printf("%d => ",tr[i]);
- 	printf("\b\b\b.   \nTOTAL HEAD MOVEMENTS : %d\n",sum);
+#include<stdlib.h>
+
+int main() {
+    int diskQueue[20], n, i, seekTime=0, diff;
+    printf("Enter the size of Queue: ");
+    scanf("%d", &n);
+    printf("Enter the Queue: ");
+    for(i=1;i<=n;i++) {                                     /* head element to be read */                       
+        scanf("%d",&diskQueue[i]);
+    }
+    printf("Enter the initial head position: ");
+    scanf("%d", &diskQueue[0]);                             /* head element */
+    printf("\nMovement of Cylinders\n");
+    for(i=0;i<n;i++) {
+        diff= abs(diskQueue[i+1] - diskQueue[i]);           /* abs( ) function in C returns the absolute value of an integer, which is always positive. */
+        seekTime+= diff;                    
+        printf("Move from %d to %d with seek time %d\n", diskQueue[i], diskQueue[i+1], diff);
+    }
+    printf("\nTotal Seek Time: %d", seekTime);
+    printf("\nAverage Seek Time = %f",(float) seekTime/n);
+    printf("\n");
+    return 0;
 }
